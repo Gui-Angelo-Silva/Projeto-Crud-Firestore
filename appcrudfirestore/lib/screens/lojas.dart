@@ -1,33 +1,28 @@
 import 'dart:async';
-
+//import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class Lojas extends StatefulWidget {
+  const Lojas({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Lojas> createState() => _LojasState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LojasState extends State<Lojas> {
   // text fields' controllers
 
   final TextEditingController _nomeController = TextEditingController();
-
-  final TextEditingController _enderecoController = TextEditingController();
-
+  final TextEditingController _bairroController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
-
-  final TextEditingController _estadoController = TextEditingController();
-  
-  final TextEditingController _celularController = TextEditingController();
-  
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _ufController = TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
 
   //final TextEditingController _imageController = TextEditingController();
 
-  final CollectionReference _chocolates =
-      FirebaseFirestore.instance.collection('chocolates');
+  final CollectionReference _lojas =
+      FirebaseFirestore.instance.collection('lojas');
 
   Future<void> _createOrUpdate([DocumentSnapshot? documentSnapshot]) async {
     String action = 'create';
@@ -36,16 +31,10 @@ class _HomePageState extends State<HomePage> {
       action = 'update';
 
       _nomeController.text = documentSnapshot['nome'];
-
-      _enderecoController.text = documentSnapshot['endereco'];
-
+      _bairroController.text = documentSnapshot['bairro'];
       _cidadeController.text = documentSnapshot['cidade'];
-
-      _estadoController.text = documentSnapshot['estado'];
-
-      _celularController.text = documentSnapshot['celular'];
-      
-      _emailController.text = documentSnapshot['email'];
+      _ufController.text = documentSnapshot['uf'];
+      _cepController.text = documentSnapshot['cep'];
 
       //_imageController.text = documentSnapshot['image'];
     }
@@ -69,110 +58,71 @@ class _HomePageState extends State<HomePage> {
               children: [
                 TextField(
                   controller: _nomeController,
-                  decoration: const InputDecoration(labelText: 'Nome'),
+                  decoration: const InputDecoration(labelText: 'Nome da Loja'),
                 ),
-
                 TextField(
-                  controller: _enderecoController,
-                  decoration: const InputDecoration(labelText: 'Endereco'),
+                  controller: _bairroController,
+                  decoration: const InputDecoration(labelText: 'Bairro'),
                 ),
-
                 TextField(
                   controller: _cidadeController,
                   decoration: const InputDecoration(labelText: 'Cidade'),
                 ),
                 TextField(
-                  controller: _estadoController,
+                  controller: _ufController,
                   decoration: const InputDecoration(labelText: 'Estado'),
                 ),
                 TextField(
-                  controller: _celularController,
-                  decoration: const InputDecoration(labelText: 'Celular'),
+                  controller: _cepController,
+                  decoration: const InputDecoration(labelText: 'Cep'),
                 ),
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                ),
-
-                TextField(
-                  // keyboardType:
-
-                  //   const TextInputType.numberWithOptions(decimal: true),
-
-                  controller: _precoController,
-
-                  decoration: const InputDecoration(
-                    labelText: 'Preço',
-                  ),
-                ),
-
-                //TextField(
-
-                //  controller: _imageController,
-
-                //  decoration: const InputDecoration(labelText: 'Imagem'),
-
-                //),
-
                 const SizedBox(
                   height: 20,
                 ),
-
                 ElevatedButton(
                   child: Text(action == 'create' ? 'Salvar' : 'Alterar'),
                   onPressed: () async {
                     final String? nome = _nomeController.text;
-
-                    final String? categoria = _categoriaController.text;
-
-                    //final double? price =
-
-                    //  double.tryParse(_priceController.text);
-
-                    final String? marca = _marcaController.text;
-
-                    final String? preco = _precoController.text;
+                    final String? bairro = _bairroController.text;
+                    final String? cidade = _cidadeController.text;
+                    final String? uf = _ufController.text;
+                    final String? cep = _cepController.text;
 
                     if (nome != null &&
-                        categoria != null &&
-                        marca != null &&
-                        preco != null) {
+                        bairro != null &&
+                        cidade != null &&
+                        uf != null &&
+                        cep != null) {
                       if (action == 'create') {
 // Persist a new product to Firestore
 
-                        await _chocolates.add({
+                        await _lojas.add({
                           "nome": nome,
-                          "categoria": categoria,
-                          "preco": preco,
-                          "marca": marca
+                          "bairro": bairro,
+                          "cidade": cidade,
+                          "uf": uf,
+                          "cep": cep
                         });
                       }
 
                       if (action == 'update') {
 // Update the product
 
-                        await _chocolates.doc(documentSnapshot!.id).update({
+                        await _lojas.doc(documentSnapshot!.id).update({
                           "nome": nome,
-                          "categoria": categoria,
-                          "marca": marca,
-                          "preco": preco
+                          "bairro": bairro,
+                          "cidade": cidade,
+                          "uf": uf,
+                          "cep": cep
                         });
                       }
-
                       // Clear the text fields
 
                       _nomeController.text = '';
-
-                      _categoriaController.text = '';
-
-                      _marcaController.text = '';
-
-                      _precoController.text = '';
-
-                      //_imageController.text = '';
-
-                      // Hide the bottom sheet
-
+                      _bairroController.text = '';
+                      _cidadeController.text = '';
+                      _ufController.text = '';
+                      _cepController.text = '';
                       Navigator.of(context).pop();
                     }
                   },
@@ -185,13 +135,13 @@ class _HomePageState extends State<HomePage> {
 
   // Deleteing a product by id
 
-  Future<void> _deleteProduct(String productId) async {
-    await _chocolates.doc(productId).delete();
+  Future<void> _deleteProduct(String lojasId) async {
+    await _lojas.doc(lojasId).delete();
 
-// Show a snackbar
+    // Show a snackbar
 
     ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Chocolate excluído!')));
+        .showSnackBar(const SnackBar(content: Text('Loja excluída!')));
   }
 
   @override
@@ -201,10 +151,10 @@ class _HomePageState extends State<HomePage> {
         title: const Text('AppBoersChocolate'),
       ),
 
-// Using StreamBuilder to display all products from Firestore in real-time
+      // Using StreamBuilder to display all products from Firestore in real-time
 
       body: StreamBuilder(
-        stream: _chocolates.snapshots(),
+        stream: _lojas.snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
           if (streamSnapshot.hasData) {
             return ListView.builder(
@@ -217,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                   margin: const EdgeInsets.all(10),
                   child: ListTile(
                     title: Text(documentSnapshot['nome']),
-                    subtitle: Text(documentSnapshot['preco'].toString()),
+                    subtitle: Text(documentSnapshot['bairro']),
                     trailing: SizedBox(
                       width: 100,
                       child: Row(
@@ -250,7 +200,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
 
-// Add new product
+      // Add new product
 
       floatingActionButton: FloatingActionButton(
         onPressed: () => _createOrUpdate(),

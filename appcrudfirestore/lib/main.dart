@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:appcrudfirestore/screens/lojas.dart';
+void main() async { 
 
-void main() => runApp(MyApp());
+ WidgetsFlutterBinding.ensureInitialized(); 
+
+  await Firebase.initializeApp( 
+    options: const FirebaseOptions( 
+      apiKey: "AIzaSyDprxb8x2nJSfdmbqUdBSp31kIkMv5Ia4Y",
+      authDomain: "bdfirestore-48913.firebaseapp.com",
+      projectId: "bdfirestore-48913",
+      storageBucket: "bdfirestore-48913.appspot.com",
+      messagingSenderId: "584524985300",
+      appId: "1:584524985300:web:e8032c577c8e047d4bdc41")
+    );
+       runApp(const MyApp()); 
+
+} 
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -50,9 +67,11 @@ class MyHomePage extends StatelessWidget {
               ),
               ListTile(
                 leading: Icon(Icons.shopping_cart),
-                title: Text("Barbearia"),
+                title: Text("Lojas"),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => Lojas()
+                  ));
 
                   //Navegar para outra página
                 },
